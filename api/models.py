@@ -4,7 +4,10 @@ from django.db import models
 class Game(models.Model):
     name = models.CharField(max_length=50)
     abbreviation = models.CharField(max_length=10)
-    released_date = models.DateField()
+    released_date = models.DateField(
+        blank=True,
+        null=True,
+    )
     platform = models.CharField(max_length=15)
     cover = models.URLField(blank=True)
 

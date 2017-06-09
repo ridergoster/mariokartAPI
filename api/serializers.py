@@ -7,28 +7,28 @@ class CircuitSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Circuit
-        fields = ('name', 'cups', 'nb_laps', 'img_url')
+        fields = '__all__'
 
 
 class GameSerializer(serializers.ModelSerializer):
     class Meta:
         model = Game
-        fields = ('name', 'abbreviation', 'released_date', 'platform', 'cover')
+        fields = '__all__'
 
 
 class CupSerializer(serializers.ModelSerializer):
     class Meta:
         model = Cup
-        fields = ('name', 'img_url', 'game', 'retro')
+        fields = '__all__'
 
 
 class CharacterSerializer(serializers.ModelSerializer):
     class Meta:
-        model: Character
-        fields: '__all__'
+        model = Character
+        fields = '__all__'
 
 
 class StatisticSerializer(serializers.ModelSerializer):
     class Meta:
         model = Statistic
-        fields = ('character', 'hours', 'avg_position', 'nb_use')
+        fields = '__all__'
