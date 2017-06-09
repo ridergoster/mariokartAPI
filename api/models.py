@@ -102,6 +102,7 @@ class Statistic(models.Model):
         Character,
         on_delete=models.CASCADE,
         primary_key=True,
+        related_name="statistic",
     )
     hours = models.IntegerField(
         default=0,

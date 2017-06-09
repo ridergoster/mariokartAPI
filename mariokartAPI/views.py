@@ -8,9 +8,8 @@ from rest_framework.exceptions import ParseError
 from rest_framework.parsers import JSONParser
 
 from api.auth import get_or_create_token, get_basic_auth, check_request_token
-from api.models import Game, Circuit, Character, Cup
-from api.serializers import GameSerializer, CircuitSerializer, CharacterSerializer, CupSerializer, UserSerializer
-
+from api.models import Game, Circuit, Character, Cup, Statistic
+from api.serializers import GameSerializer, CircuitSerializer, CharacterSerializer, CupSerializer, UserSerializer, StatisticSerializer
 
 def create_user(request):
     try:
@@ -42,10 +41,15 @@ def characters_list(request):
     serializer = CharacterSerializer(characters, many=True, context={'request': request})
     return JsonResponse(serializer.data, safe=False, status=status.HTTP_200_OK)
 
-
 def cups_list(request):
     cups = Cup.objects.all()
     serializer = CupSerializer(cups, many=True, context={'request': request})
+    return JsonResponse(serializer.data, safe=False, status=status.HTTP_200_OK)
+
+
+def statistics_list(request):
+    statistics = Statistic.objects.all()
+    serializer = StatisticSerializer(statistics, many=True, context={'request': request})
     return JsonResponse(serializer.data, safe=False, status=status.HTTP_200_OK)
 
 
@@ -66,6 +70,11 @@ def character_detail(request, character):
 
 def cup_detail(request, cup):
     serializer = CupSerializer(cup, context={'request': request})
+    return JsonResponse(serializer.data, status=status.HTTP_200_OK)
+
+
+def statistic_detail(request, statistic):
+    serializer = StatisticSerializer(statistic, context={'request': request})
     return JsonResponse(serializer.data, status=status.HTTP_200_OK)
 
 
@@ -121,12 +130,38 @@ def create_cup(request):
         return JsonResponse(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
+def create_statistic(request):
+    try:
+        data = JSONParser().parse(request)
+    except ParseError:
+        return HttpResponse(status=400)
+    serializer = StatisticSerializer(data=data, context={'request': request})
+    if serializer.is_valid():
+        serializer.save()
+        return JsonResponse(serializer.data, status=status.HTTP_201_CREATED)
+    else:
+        return JsonResponse(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
 def update_character(request, character):
     try:
         data = JSONParser().parse(request)
     except ParseError:
         return HttpResponse(status=status.HTTP_400_BAD_REQUEST)
     serializer = CharacterSerializer(character, data=data, context={'request': request})
+    if serializer.is_valid():
+        serializer.save()
+        return JsonResponse(serializer.data, status=status.HTTP_200_OK)
+    else:
+        return JsonResponse(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+def update_statistic(request, statistic):
+    try:
+        data = JSONParser().parse(request)
+    except ParseError:
+        return HttpResponse(status=status.HTTP_400_BAD_REQUEST)
+    serializer = StatisticSerializer(statistic, data=data, context={'request': request})
     if serializer.is_valid():
         serializer.save()
         return JsonResponse(serializer.data, status=status.HTTP_200_OK)
@@ -153,6 +188,9 @@ def delete_cup(cup):
     cup.delete()
     return HttpResponse(status=status.HTTP_204_NO_CONTENT)
 
+def delete_statistic(statistic):
+    statistic.delete()
+    return HttpResponse(status=status.HTTP_204_NO_CONTENT)
 
 @csrf_exempt
 def users(request):
@@ -298,6 +336,43 @@ def cup(request, pk):
         authorized = check_request_token(request)
         if authorized:
             return delete_cup(cup)
+        else:
+            return HttpResponse(status=status.HTTP_401_UNAUTHORIZED)
+    else:
+        return HttpResponse(status=status.HTTP_405_METHOD_NOT_ALLOWED)
+
+
+@csrf_exempt
+def statistics(request):
+    if request.method == 'GET':
+        return statistics_list(request)
+    elif request.method == 'POST':
+        authorized = check_request_token(request)
+        if authorized:
+            return create_statistic(request)
+        else:
+            return HttpResponse(status=status.HTTP_401_UNAUTHORIZED)
+    else:
+        return HttpResponse(status=status.HTTP_405_METHOD_NOT_ALLOWED)
+
+@csrf_exempt
+def statistic(request, pk):
+    try:
+        statistic = Statistic.objects.get(pk=pk)
+    except Cup.DoesNotExist:
+        return HttpResponse(status=status.HTTP_404_NOT_FOUND)
+    if request.method == 'GET':
+        return statistic_detail(request, statistic)
+    elif request.method == 'PUT':
+        authorized = check_request_token(request)
+        if authorized:
+            return update_statistic(request, statistic)
+        else:
+            return HttpResponse(status=status.HTTP_401_UNAUTHORIZED)
+    elif request.method == 'DELETE':
+        authorized = check_request_token(request)
+        if authorized:
+            return delete_statistic(statistic)
         else:
             return HttpResponse(status=status.HTTP_401_UNAUTHORIZED)
     else:
