@@ -38,19 +38,24 @@ def circuits(request):
 
 
 @csrf_exempt
-def circuit_detail(request, pk):
+def circuit(request, pk):
     try:
         circuit = Circuit.objects.get(pk=pk)
     except Circuit.DoesNotExist:
         return HttpResponse(status=status.HTTP_404_NOT_FOUND)
-
     if request.method == 'GET':
-        serializer = CircuitSerializer(circuit)
-        return JsonResponse(serializer.data, status=status.HTTP_200_OK)
-
+        return circuit_detail(circuit)
     elif request.method == 'DELETE':
-        circuit.delete()
-        return HttpResponse(status=status.HTTP_204_NO_CONTENT)
-
+        return delete_circuit(circuit)
     else:
         return HttpResponse(status=status.HTTP_405_METHOD_NOT_ALLOWED)
+
+
+def circuit_detail(circuit):
+    serializer = CircuitSerializer(circuit)
+    return JsonResponse(serializer.data, status=status.HTTP_200_OK)
+
+
+def delete_circuit(circuit):
+    circuit.delete()
+    return HttpResponse(status=status.HTTP_204_NO_CONTENT)
