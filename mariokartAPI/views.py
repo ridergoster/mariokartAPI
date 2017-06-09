@@ -4,8 +4,8 @@ from rest_framework import status
 from rest_framework.exceptions import ParseError
 from rest_framework.parsers import JSONParser
 
-from api.models import Game, Circuit, Character
-from api.serializers import GameSerializer, CircuitSerializer, CharacterSerializer
+from api.models import Game, Circuit, Character, Cup
+from api.serializers import GameSerializer, CircuitSerializer, CharacterSerializer, CupSerializer
 
 
 def games_list(request):
@@ -26,6 +26,12 @@ def characters_list(request):
     return JsonResponse(serializer.data, safe=False, status=status.HTTP_200_OK)
 
 
+def cups_list(request):
+    cups = Cup.objects.all()
+    serializer = CupSerializer(cups, many=True)
+    return JsonResponse(serializer.data, safe=False, status=status.HTTP_200_OK)
+
+
 def game_detail(game):
     serializer = GameSerializer(game)
     return JsonResponse(serializer.data, status.HTTP_200_OK)
@@ -38,6 +44,11 @@ def circuit_detail(circuit):
 
 def character_detail(character):
     serializer = CharacterSerializer(character)
+    return JsonResponse(serializer.data, status=status.HTTP_200_OK)
+
+
+def cup_detail(cup):
+    serializer = CupSerializer(cup)
     return JsonResponse(serializer.data, status=status.HTTP_200_OK)
 
 
@@ -80,6 +91,19 @@ def create_character(request):
         return JsonResponse(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
+def create_cup(request):
+    try:
+        data = JSONParser().parse(request)
+    except ParseError:
+        return HttpResponse(status=400)
+    serializer = CupSerializer(data=data)
+    if serializer.is_valid():
+        serializer.save()
+        return JsonResponse(serializer.data, status=status.HTTP_201_CREATED)
+    else:
+        return JsonResponse(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
 def update_character(request, character):
     try:
         data = JSONParser().parse(request)
@@ -106,6 +130,11 @@ def delete_circuit(circuit):
 def delete_character(character):
     character.delete()
     return HttpResponse(status=status.HTTP_200_OK)
+
+
+def delete_cup(cup):
+    cup.delete()
+    return HttpResponse(status=status.HTTP_204_NO_CONTENT)
 
 
 @csrf_exempt
@@ -174,5 +203,29 @@ def character(request, pk):
         return update_character(request, character)
     elif request.method == 'DELETE':
         return delete_character(character)
+    else:
+        return HttpResponse(status=status.HTTP_405_METHOD_NOT_ALLOWED)
+
+
+@csrf_exempt
+def cups(request):
+    if request.method == 'GET':
+        return cups_list(request)
+    elif request.method == 'POST':
+        return create_cup(request)
+    else:
+        return HttpResponse(status=status.HTTP_405_METHOD_NOT_ALLOWED)
+
+
+@csrf_exempt
+def cup(request, pk):
+    try:
+        cup = Cup.objects.get(pk=pk)
+    except Cup.DoesNotExist:
+        return HttpResponse(status=status.HTTP_404_NOT_FOUND)
+    if request.method == 'GET':
+        return cup_detail(cup)
+    elif request.method == 'DELETE':
+        return delete_cup(cup)
     else:
         return HttpResponse(status=status.HTTP_405_METHOD_NOT_ALLOWED)

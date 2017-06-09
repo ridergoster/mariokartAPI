@@ -26,4 +26,7 @@ urlpatterns = [
     url(r'^circuits/(?P<pk>[0-9]+)/$', views.circuit, name='circuit'),
     url(r'^characters/$', views.characters, name='characters'),
     url(r'^characters/(?P<pk>[0-9]+)/$', views.character, name='character'),
+    url(r'^cups/$', views.cups, name='cups'),
+    url(r'^cups/(?P<pk>[0-9]+)/$', views.cup, name='cup'),
+
 ]
