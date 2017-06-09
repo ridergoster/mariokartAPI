@@ -7,9 +7,10 @@ from rest_framework import status
 from rest_framework.exceptions import ParseError
 from rest_framework.parsers import JSONParser
 
-from api.auth import get_or_create_token, get_basic_auth
+from api.auth import get_or_create_token, get_basic_auth, check_request_token
 from api.models import Game, Circuit, Character, Cup
 from api.serializers import GameSerializer, CircuitSerializer, CharacterSerializer, CupSerializer, UserSerializer
+
 
 
 def login(request):
@@ -170,7 +171,11 @@ def games(request):
     if request.method == 'GET':
         return games_list(request)
     elif request.method == 'POST':
-        return create_game(request)
+        authorized = check_request_token(request)
+        if authorized:
+            return create_game(request)
+        else:
+            return HttpResponse(status=status.HTTP_401_UNAUTHORIZED)
     else:
         return HttpResponse(status=status.HTTP_405_METHOD_NOT_ALLOWED)
 
@@ -192,7 +197,11 @@ def game(request, pk):
     if request.method == 'GET':
         return game_detail(request, game)
     elif request.method == 'DELETE':
-        return delete_game(game)
+        authorized = check_request_token(request)
+        if authorized:
+            return delete_game(game)
+        else:
+            return HttpResponse(status=status.HTTP_401_UNAUTHORIZED)
     return HttpResponse(status=status.HTTP_405_METHOD_NOT_ALLOWED)
 
 
@@ -201,7 +210,11 @@ def circuits(request):
     if request.method == 'GET':
         return circuits_list(request)
     elif request.method == 'POST':
-        return create_circuit(request)
+        authorized = check_request_token(request)
+        if authorized:
+            return create_circuit(request)
+        else:
+            return HttpResponse(status=status.HTTP_401_UNAUTHORIZED)
     else:
         return HttpResponse(status=status.HTTP_405_METHOD_NOT_ALLOWED)
 
@@ -215,7 +228,11 @@ def circuit(request, pk):
     if request.method == 'GET':
         return circuit_detail(request, circuit)
     elif request.method == 'DELETE':
-        return delete_circuit(circuit)
+        authorized = check_request_token(request)
+        if authorized:
+            return delete_circuit(circuit)
+        else:
+            return HttpResponse(status=status.HTTP_401_UNAUTHORIZED)
     else:
         return HttpResponse(status=status.HTTP_405_METHOD_NOT_ALLOWED)
 
@@ -225,7 +242,11 @@ def characters(request):
     if request.method == 'GET':
         return characters_list(request)
     elif request.method == 'POST':
-        return create_character(request)
+        authorized = check_request_token(request)
+        if authorized:
+            return create_character(request)
+        else:
+            return HttpResponse(status=status.HTTP_401_UNAUTHORIZED)
     else:
         return HttpResponse(status=status.HTTP_405_METHOD_NOT_ALLOWED)
 
@@ -236,9 +257,17 @@ def character(request, pk):
     if request.method == 'GET':
         return character_detail(request, character)
     elif request.method == 'PUT':
-        return update_character(request, character)
+        authorized = check_request_token(request)
+        if authorized:
+            return update_character(request, character)
+        else:
+            return HttpResponse(status=status.HTTP_401_UNAUTHORIZED)
     elif request.method == 'DELETE':
-        return delete_character(character)
+        authorized = check_request_token(request)
+        if authorized:
+            return delete_character(character)
+        else:
+            return HttpResponse(status=status.HTTP_401_UNAUTHORIZED)
     else:
         return HttpResponse(status=status.HTTP_405_METHOD_NOT_ALLOWED)
 
@@ -248,7 +277,11 @@ def cups(request):
     if request.method == 'GET':
         return cups_list(request)
     elif request.method == 'POST':
-        return create_cup(request)
+        authorized = check_request_token(request)
+        if authorized:
+            return create_cup(request)
+        else:
+            return HttpResponse(status=status.HTTP_401_UNAUTHORIZED)
     else:
         return HttpResponse(status=status.HTTP_405_METHOD_NOT_ALLOWED)
 
@@ -262,6 +295,10 @@ def cup(request, pk):
     if request.method == 'GET':
         return cup_detail(request, cup)
     elif request.method == 'DELETE':
-        return delete_cup(cup)
+        authorized = check_request_token(request)
+        if authorized:
+            return delete_cup(cup)
+        else:
+            return HttpResponse(status=status.HTTP_401_UNAUTHORIZED)
     else:
         return HttpResponse(status=status.HTTP_405_METHOD_NOT_ALLOWED)
