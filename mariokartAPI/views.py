@@ -12,18 +12,6 @@ from api.models import Game, Circuit, Character, Cup
 from api.serializers import GameSerializer, CircuitSerializer, CharacterSerializer, CupSerializer, UserSerializer
 
 
-
-def login(request):
-    basic = get_basic_auth(request)
-    if basic is not None:
-        log = b64decode(bytes(basic, 'ascii')).decode('ascii').split(':')
-        user = authenticate(username=log[0], password=log[1])
-        if user is not None:
-            token = get_or_create_token(user)
-            return JsonResponse(data={token: token.hash})
-    return HttpResponse(status=status.HTTP_400_BAD_REQUEST)
-
-
 def create_user(request):
     try:
         data = JSONParser().parse(request)
@@ -167,6 +155,26 @@ def delete_cup(cup):
 
 
 @csrf_exempt
+def users(request):
+    if request.method == 'POST':
+        return create_user(request)
+    else:
+        return HttpResponse(status=status.HTTP_405_METHOD_NOT_ALLOWED)
+
+
+@csrf_exempt
+def login(request):
+    basic = get_basic_auth(request)
+    if basic is not None:
+        log = b64decode(bytes(basic, 'ascii')).decode('ascii').split(':')
+        user = authenticate(username=log[0], password=log[1])
+        if user is not None:
+            token = get_or_create_token(user)
+            return JsonResponse(data={token: token.hash})
+    return HttpResponse(status=status.HTTP_400_BAD_REQUEST)
+
+
+@csrf_exempt
 def games(request):
     if request.method == 'GET':
         return games_list(request)
@@ -176,14 +184,6 @@ def games(request):
             return create_game(request)
         else:
             return HttpResponse(status=status.HTTP_401_UNAUTHORIZED)
-    else:
-        return HttpResponse(status=status.HTTP_405_METHOD_NOT_ALLOWED)
-
-
-@csrf_exempt
-def users(request):
-    if request.method == 'POST':
-        return create_user(request)
     else:
         return HttpResponse(status=status.HTTP_405_METHOD_NOT_ALLOWED)
 
