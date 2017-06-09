@@ -65,6 +65,10 @@ class Character(models.Model):
         choices=WEIGHT,
         default='M',
     )
+    games = models.ManyToManyField(
+        Game,
+        related_name="characters"
+    )
 
     def __str__(self):
         return "%s" % self.name
