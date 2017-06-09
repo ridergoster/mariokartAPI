@@ -1,5 +1,6 @@
 from base64 import b64decode
 
+from django.contrib.auth.models import User
 from django.contrib.auth import authenticate
 from django.http import JsonResponse, HttpResponse
 from django.views.decorators.csrf import csrf_exempt
@@ -11,6 +12,7 @@ from api.auth import get_or_create_token, get_basic_auth, check_request_token
 from api.models import Game, Circuit, Character, Cup, Statistic
 from api.serializers import GameSerializer, CircuitSerializer, CharacterSerializer, CupSerializer, UserSerializer, StatisticSerializer
 
+
 def create_user(request):
     try:
         data = JSONParser().parse(request)
@@ -18,8 +20,9 @@ def create_user(request):
         return HttpResponse(status=400)
     serializer = UserSerializer(data=data, context={'request': request})
     if serializer.is_valid():
-        serializer.save()
-        return JsonResponse(serializer.data, status=status.HTTP_201_CREATED)
+        user = User.objects.create_user(username=data['username'], password=data['password'])
+        token = get_or_create_token(user)
+        return JsonResponse(data={'token': token.hash})
     else:
         return JsonResponse(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
@@ -208,7 +211,7 @@ def login(request):
         user = authenticate(username=log[0], password=log[1])
         if user is not None:
             token = get_or_create_token(user)
-            return JsonResponse(data={token: token.hash})
+            return JsonResponse(data={'token': token.hash})
     return HttpResponse(status=status.HTTP_400_BAD_REQUEST)
 
 

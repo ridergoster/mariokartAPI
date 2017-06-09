@@ -2,7 +2,7 @@ import hashlib
 
 from django.utils import timezone
 
-from .models import Token
+from api.models import Token
 
 
 def get_or_create_token(user):

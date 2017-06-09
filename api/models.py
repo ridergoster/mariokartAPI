@@ -16,6 +16,8 @@ class Token(models.Model):
     def is_expired(self):
         return self.expiration_date < timezone.now()
 
+    def __str__(self):
+        return "%s" % self.hash
 
 class Game(models.Model):
     name = models.CharField(max_length=50)
