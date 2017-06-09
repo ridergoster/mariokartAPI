@@ -22,12 +22,18 @@ class Cup(models.Model):
     )
     retro = models.BooleanField(default=False)
 
+    def __str__(self):
+        return "%s" % self.name
+
 
 class Circuit(models.Model):
     name = models.CharField(max_length=50)
     cup = models.ManyToManyField(Cup)
     nb_laps = models.IntegerField(default=3)
     img_url = models.CharField(max_length=500)
+
+    def __str__(self):
+        return "%s" % self.name
 
 
 class Character(models.Model):
