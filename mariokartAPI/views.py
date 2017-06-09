@@ -10,45 +10,45 @@ from api.serializers import GameSerializer, CircuitSerializer, CharacterSerializ
 
 def games_list(request):
     games = Game.objects.all()
-    serializer = GameSerializer(games, many=True)
+    serializer = GameSerializer(games, many=True, context={'request': request})
     return JsonResponse(serializer.data, safe=False, status=status.HTTP_200_OK)
 
 
 def circuits_list(request):
     circuits = Circuit.objects.all()
-    serializer = CircuitSerializer(circuits, many=True)
+    serializer = CircuitSerializer(circuits, many=True, context={'request': request})
     return JsonResponse(serializer.data, safe=False, status=status.HTTP_200_OK)
 
 
 def characters_list(request):
     characters = Character.objects.all()
-    serializer = CharacterSerializer(characters, many=True)
+    serializer = CharacterSerializer(characters, many=True, context={'request': request})
     return JsonResponse(serializer.data, safe=False, status=status.HTTP_200_OK)
 
 
 def cups_list(request):
     cups = Cup.objects.all()
-    serializer = CupSerializer(cups, many=True)
+    serializer = CupSerializer(cups, many=True, context={'request': request})
     return JsonResponse(serializer.data, safe=False, status=status.HTTP_200_OK)
 
 
-def game_detail(game):
-    serializer = GameSerializer(game)
-    return JsonResponse(serializer.data, status.HTTP_200_OK)
-
-
-def circuit_detail(circuit):
-    serializer = CircuitSerializer(circuit)
+def game_detail(request, game):
+    serializer = GameSerializer(game, context={'request': request})
     return JsonResponse(serializer.data, status=status.HTTP_200_OK)
 
 
-def character_detail(character):
-    serializer = CharacterSerializer(character)
+def circuit_detail(request, circuit):
+    serializer = CircuitSerializer(circuit, context={'request': request})
     return JsonResponse(serializer.data, status=status.HTTP_200_OK)
 
 
-def cup_detail(cup):
-    serializer = CupSerializer(cup)
+def character_detail(request, character):
+    serializer = CharacterSerializer(character, context={'request': request})
+    return JsonResponse(serializer.data, status=status.HTTP_200_OK)
+
+
+def cup_detail(request, cup):
+    serializer = CupSerializer(cup, context={'request': request})
     return JsonResponse(serializer.data, status=status.HTTP_200_OK)
 
 
@@ -57,7 +57,7 @@ def create_game(request):
         data = JSONParser().parse(request)
     except ParseError:
         return HttpResponse(status=400)
-    serializer = GameSerializer(data=data)
+    serializer = GameSerializer(data=data, context={'request': request})
     if serializer.is_valid():
         serializer.save()
         return JsonResponse(serializer.data, status=status.HTTP_201_CREATED)
@@ -70,7 +70,7 @@ def create_circuit(request):
         data = JSONParser().parse(request)
     except ParseError:
         return HttpResponse(status=400)
-    serializer = CircuitSerializer(data=data)
+    serializer = CircuitSerializer(data=data, context={'request': request})
     if serializer.is_valid():
         serializer.save()
         return JsonResponse(serializer.data, status=status.HTTP_201_CREATED)
@@ -83,7 +83,7 @@ def create_character(request):
         data = JSONParser().parse(request)
     except ParseError:
         return HttpResponse(status=400)
-    serializer = CharacterSerializer(data=data)
+    serializer = CharacterSerializer(data=data, context={'request': request})
     if serializer.is_valid():
         serializer.save()
         return JsonResponse(serializer.data, status=status.HTTP_201_CREATED)
@@ -96,7 +96,7 @@ def create_cup(request):
         data = JSONParser().parse(request)
     except ParseError:
         return HttpResponse(status=400)
-    serializer = CupSerializer(data=data)
+    serializer = CupSerializer(data=data, context={'request': request})
     if serializer.is_valid():
         serializer.save()
         return JsonResponse(serializer.data, status=status.HTTP_201_CREATED)
@@ -109,7 +109,7 @@ def update_character(request, character):
         data = JSONParser().parse(request)
     except ParseError:
         return HttpResponse(status=status.HTTP_400_BAD_REQUEST)
-    serializer = CharacterSerializer(character, data=data)
+    serializer = CharacterSerializer(character, data=data, context={'request': request})
     if serializer.is_valid():
         serializer.save()
         return JsonResponse(serializer.data, status=status.HTTP_200_OK)
@@ -154,7 +154,7 @@ def game(request, pk):
     except Game.DoesNotExist:
         return HttpResponse(status=status.HTTP_404_NOT_FOUND)
     if request.method == 'GET':
-        return game_detail(game)
+        return game_detail(request, game)
     elif request.method == 'DELETE':
         return delete_game(game)
     return HttpResponse(status=status.HTTP_405_METHOD_NOT_ALLOWED)
@@ -177,7 +177,7 @@ def circuit(request, pk):
     except Circuit.DoesNotExist:
         return HttpResponse(status=status.HTTP_404_NOT_FOUND)
     if request.method == 'GET':
-        return circuit_detail(circuit)
+        return circuit_detail(request, circuit)
     elif request.method == 'DELETE':
         return delete_circuit(circuit)
     else:
@@ -198,7 +198,7 @@ def characters(request):
 def character(request, pk):
     character = Character.objects.get(pk=pk)
     if request.method == 'GET':
-        return character_detail(character)
+        return character_detail(request, character)
     elif request.method == 'PUT':
         return update_character(request, character)
     elif request.method == 'DELETE':
@@ -224,7 +224,7 @@ def cup(request, pk):
     except Cup.DoesNotExist:
         return HttpResponse(status=status.HTTP_404_NOT_FOUND)
     if request.method == 'GET':
-        return cup_detail(cup)
+        return cup_detail(request, cup)
     elif request.method == 'DELETE':
         return delete_cup(cup)
     else:

@@ -22,7 +22,13 @@ class CupSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 
-class CharacterSerializer(serializers.ModelSerializer):
+class CharacterSerializer(serializers.HyperlinkedModelSerializer):
+    games = serializers.HyperlinkedIdentityField(
+        view_name='game-detail',
+        lookup_field='pk',
+        many=True,
+    )
+
     class Meta:
         model = Character
         fields = '__all__'
