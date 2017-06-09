@@ -1,11 +1,26 @@
+from base64 import b64decode
+
+from django.contrib.auth import authenticate
 from django.http import JsonResponse, HttpResponse
 from django.views.decorators.csrf import csrf_exempt
 from rest_framework import status
 from rest_framework.exceptions import ParseError
 from rest_framework.parsers import JSONParser
 
+from api.auth import get_or_create_token, get_basic_auth
 from api.models import Game, Circuit, Character, Cup
 from api.serializers import GameSerializer, CircuitSerializer, CharacterSerializer, CupSerializer
+
+@csrf_exempt
+def login(request):
+    basic = get_basic_auth(request)
+    if basic is not None:
+        log = b64decode(bytes(basic, 'ascii')).decode('ascii').split(':')
+        user = authenticate(username=log[0], password=log[1])
+        if user is not None:
+            token = get_or_create_token(user)
+            return JsonResponse(data={token: token.hash})
+    return HttpResponse(status=status.HTTP_400_BAD_REQUEST)
 
 
 def games_list(request):
