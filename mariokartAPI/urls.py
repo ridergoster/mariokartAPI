@@ -21,4 +21,5 @@ from mariokartAPI import views
 urlpatterns = [
     url(r'^admin/', admin.site.urls),
     url(r'^circuits/', views.circuits, name='circuits'),
+    url(r'^circuits/(?P<pk>[0-9]+)/$', views.circuit_detail, name='circuits-detail'),
 ]

@@ -30,8 +30,27 @@ def create_circuit(request):
 @csrf_exempt
 def circuits(request):
     if request.method == 'GET':
-        circuits_list(request)
+        return circuits_list(request)
     elif request.method == 'POST':
-        create_circuit(request)
+        return create_circuit(request)
+    else:
+        return HttpResponse(status=status.HTTP_405_METHOD_NOT_ALLOWED)
+
+
+@csrf_exempt
+def circuit_detail(request, pk):
+    try:
+        circuit = Circuit.objects.get(pk=pk)
+    except Circuit.DoesNotExist:
+        return HttpResponse(status=status.HTTP_404_NOT_FOUND)
+
+    if request.method == 'GET':
+        serializer = CircuitSerializer(circuit)
+        return JsonResponse(serializer.data, status=status.HTTP_200_OK)
+
+    elif request.method == 'DELETE':
+        circuit.delete()
+        return HttpResponse(status=status.HTTP_204_NO_CONTENT)
+
     else:
         return HttpResponse(status=status.HTTP_405_METHOD_NOT_ALLOWED)
