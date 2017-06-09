@@ -14,7 +14,7 @@ class Game(models.Model):
 
 class Cup(models.Model):
     name = models.CharField(max_length=50)
-    img_url = models.CharField(max_length=500)
+    img_url = models.CharField(max_length=500, blank=True)
     game = models.ForeignKey(
         Game,
         on_delete=models.CASCADE,
@@ -28,9 +28,15 @@ class Cup(models.Model):
 
 class Circuit(models.Model):
     name = models.CharField(max_length=50)
-    cup = models.ManyToManyField(Cup)
+    cups = models.ManyToManyField(
+        Cup,
+        related_name='circuits',
+    )
     nb_laps = models.IntegerField(default=3)
-    img_url = models.CharField(max_length=500)
+    img_url = models.CharField(
+        max_length=500,
+        blank=True,
+    )
 
     def __str__(self):
         return "%s" % self.name
