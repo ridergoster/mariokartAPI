@@ -9,7 +9,8 @@ from rest_framework.parsers import JSONParser
 
 from api.auth import get_or_create_token, get_basic_auth
 from api.models import Game, Circuit, Character, Cup
-from api.serializers import GameSerializer, CircuitSerializer, CharacterSerializer, CupSerializer
+from api.serializers import GameSerializer, CircuitSerializer, CharacterSerializer, CupSerializer, UserSerializer
+
 
 def login(request):
     basic = get_basic_auth(request)
@@ -20,6 +21,19 @@ def login(request):
             token = get_or_create_token(user)
             return JsonResponse(data={token: token.hash})
     return HttpResponse(status=status.HTTP_400_BAD_REQUEST)
+
+
+def create_user(request):
+    try:
+        data = JSONParser().parse(request)
+    except ParseError:
+        return HttpResponse(status=400)
+    serializer = UserSerializer(data=data, context={'request': request})
+    if serializer.is_valid():
+        serializer.save()
+        return JsonResponse(serializer.data, status=status.HTTP_201_CREATED)
+    else:
+        return JsonResponse(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
 def games_list(request):
@@ -157,6 +171,14 @@ def games(request):
         return games_list(request)
     elif request.method == 'POST':
         return create_game(request)
+    else:
+        return HttpResponse(status=status.HTTP_405_METHOD_NOT_ALLOWED)
+
+
+@csrf_exempt
+def users(request):
+    if request.method == 'POST':
+        return create_user(request)
     else:
         return HttpResponse(status=status.HTTP_405_METHOD_NOT_ALLOWED)
 

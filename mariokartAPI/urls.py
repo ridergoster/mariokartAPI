@@ -5,6 +5,7 @@ from . import views
 
 urlpatterns = [
     url(r'^login/$', views.login, name='login'),
+    url(r'^users/$', views.users, name='user'),
     url(r'^admin/', admin.site.urls),
     url(r'^games/$', views.games, name='game'),
     url(r'^games/(?P<pk>[0-9]+)/$', views.game, name='game-detail'),
