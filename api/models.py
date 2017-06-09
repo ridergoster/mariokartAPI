@@ -44,7 +44,10 @@ class Circuit(models.Model):
 
 class Character(models.Model):
     name = models.CharField(max_length=30)
-    birthDate = models.DateTimeField()
+    birthDate = models.DateTimeField(
+        blank=True,
+        null=True,
+    )
     GENDER = (
         ('M', 'Male'),
         ('F', 'Female'),
@@ -67,7 +70,8 @@ class Character(models.Model):
     )
     games = models.ManyToManyField(
         Game,
-        related_name="characters"
+        related_name="characters",
+        blank=True,
     )
 
     def __str__(self):

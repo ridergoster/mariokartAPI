@@ -20,6 +20,10 @@ from mariokartAPI import views
 
 urlpatterns = [
     url(r'^admin/', admin.site.urls),
+    url(r'^games/$', views.games, name='games'),
+    url(r'^games/(?P<pk>[0-9]+)/$', views.game, name='game'),
     url(r'^circuits/$', views.circuits, name='circuits'),
-    url(r'^circuits/(?P<pk>[0-9]+)/$', views.circuit, name='circuits-detail'),
+    url(r'^circuits/(?P<pk>[0-9]+)/$', views.circuit, name='circuit'),
+    url(r'^characters/$', views.characters, name='characters'),
+    url(r'^characters/(?P<pk>[0-9]+)/$', views.character, name='character'),
 ]

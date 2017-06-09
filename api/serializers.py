@@ -22,10 +22,10 @@ class CupSerializer(serializers.ModelSerializer):
         fields = ('name', 'img_url', 'game', 'retro')
 
 
-class CharacterSerializer(serializers.ModelSerializer):#todo
+class CharacterSerializer(serializers.ModelSerializer):
     class Meta:
-        model = Character
-        fields = ('name', 'img_url', 'game', 'retro')
+        model: Character
+        fields: '__all__'
 
 
 class StatisticSerializer(serializers.ModelSerializer):
