@@ -11,7 +11,6 @@ from api.auth import get_or_create_token, get_basic_auth
 from api.models import Game, Circuit, Character, Cup
 from api.serializers import GameSerializer, CircuitSerializer, CharacterSerializer, CupSerializer
 
-@csrf_exempt
 def login(request):
     basic = get_basic_auth(request)
     if basic is not None:
