@@ -213,7 +213,7 @@ def update_statistic(request, statistic):
 
 def delete_game(game):
     game.delete()
-    return HttpResponse(status=status.HTTP_200_OK)
+    return HttpResponse(status=status.HTTP_204_NO_CONTENT)
 
 
 def delete_circuit(circuit):
@@ -223,7 +223,7 @@ def delete_circuit(circuit):
 
 def delete_character(character):
     character.delete()
-    return HttpResponse(status=status.HTTP_200_OK)
+    return HttpResponse(status=status.HTTP_204_NO_CONTENT)
 
 
 def delete_cup(cup):
@@ -251,7 +251,7 @@ def login(request):
         if user is not None:
             token = get_or_create_token(user)
             return JsonResponse(data={'token': token.hash})
-    return HttpResponse(status=status.HTTP_400_BAD_REQUEST)
+    return HttpResponse(status=status.HTTP_403_FORBIDDEN)
 
 
 @csrf_exempt
@@ -419,7 +419,7 @@ def statistics(request):
 def statistic(request, pk):
     try:
         statistic = Statistic.objects.get(pk=pk)
-    except Cup.DoesNotExist:
+    except Statistic.DoesNotExist:
         return HttpResponse(status=status.HTTP_404_NOT_FOUND)
     if request.method == 'GET':
         return statistic_detail(request, statistic)
