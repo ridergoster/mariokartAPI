@@ -9,6 +9,7 @@ urlpatterns = [
     url(r'^admin/', admin.site.urls),
     url(r'^games/$', views.games, name='game'),
     url(r'^games/(?P<pk>[0-9]+)/$', views.game, name='game-detail'),
+    url(r'^games/(?P<pk>[0-9]+)/runs$', views.game_run, name='game-run'),
     url(r'^circuits/$', views.circuits, name='circuit'),
     url(r'^circuits/(?P<pk>[0-9]+)/$', views.circuit, name='circuit-detail'),
     url(r'^characters/$', views.characters, name='character'),

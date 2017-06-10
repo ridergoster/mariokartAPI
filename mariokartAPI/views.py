@@ -1,5 +1,5 @@
 from base64 import b64decode
-
+import requests
 from django.contrib.auth.models import User
 from django.contrib.auth import authenticate
 from django.http import JsonResponse, HttpResponse
@@ -380,3 +380,23 @@ def statistic(request, pk):
             return HttpResponse(status=status.HTTP_401_UNAUTHORIZED)
     else:
         return HttpResponse(status=status.HTTP_405_METHOD_NOT_ALLOWED)
+
+@csrf_exempt
+def game_run(request, pk):
+    try:
+        game = Game.objects.get(pk=pk)
+    except Game.DoesNotExist:
+        return HttpResponse(status=status.HTTP_404_NOT_FOUND)
+    if request.method == 'GET':
+        urlGame = 'http://www.speedrun.com/api/v1/games/' + game.abbreviation
+        try:
+            res = requests.get(urlGame)
+            gameSpeedRun = res.json()
+            urlRun = 'http://www.speedrun.com/api/v1/runs'
+            gameSpeedRunId = gameSpeedRun["data"]["id"]
+            print(gameSpeedRunId)
+            payloadRun = {'game': gameSpeedRunId}
+            r = requests.get(urlRun, params=payloadRun)
+            return JsonResponse(r.json(), status=status.HTTP_200_OK)
+        except Exception:
+            return HttpResponse(status=status.HTTP_400_BAD_REQUEST)
