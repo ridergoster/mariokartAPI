@@ -146,12 +146,51 @@ def create_statistic(request):
         return JsonResponse(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
+def update_game(request, game):
+    try:
+        data = JSONParser().parse(request)
+    except ParseError:
+        return HttpResponse(status=status.HTTP_400_BAD_REQUEST)
+    serializer = GameSerializer(game, data=data, context={'request': request})
+    if serializer.is_valid():
+        serializer.save()
+        return JsonResponse(serializer.data, status=status.HTTP_200_OK)
+    else:
+        return JsonResponse(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+def update_circuit(request, circuit):
+    try:
+        data = JSONParser().parse(request)
+    except ParseError:
+        return HttpResponse(status=status.HTTP_400_BAD_REQUEST)
+    serializer = CircuitSerializer(circuit, data=data, context={'request': request})
+    if serializer.is_valid():
+        serializer.save()
+        return JsonResponse(serializer.data, status=status.HTTP_200_OK)
+    else:
+        return JsonResponse(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
 def update_character(request, character):
     try:
         data = JSONParser().parse(request)
     except ParseError:
         return HttpResponse(status=status.HTTP_400_BAD_REQUEST)
     serializer = CharacterSerializer(character, data=data, context={'request': request})
+    if serializer.is_valid():
+        serializer.save()
+        return JsonResponse(serializer.data, status=status.HTTP_200_OK)
+    else:
+        return JsonResponse(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+def update_cup(request, cup):
+    try:
+        data = JSONParser().parse(request)
+    except ParseError:
+        return HttpResponse(status=status.HTTP_400_BAD_REQUEST)
+    serializer = CupSerializer(cup, data=data, context={'request': request})
     if serializer.is_valid():
         serializer.save()
         return JsonResponse(serializer.data, status=status.HTTP_200_OK)
@@ -237,6 +276,12 @@ def game(request, pk):
         return HttpResponse(status=status.HTTP_404_NOT_FOUND)
     if request.method == 'GET':
         return game_detail(request, game)
+    elif request.method == 'PUT':
+        authorized = check_request_token(request)
+        if authorized:
+            return update_game(request, game)
+        else:
+            return HttpResponse(status=status.HTTP_401_UNAUTHORIZED)
     elif request.method == 'DELETE':
         authorized = check_request_token(request)
         if authorized:
@@ -268,6 +313,12 @@ def circuit(request, pk):
         return HttpResponse(status=status.HTTP_404_NOT_FOUND)
     if request.method == 'GET':
         return circuit_detail(request, circuit)
+    elif request.method == 'PUT':
+        authorized = check_request_token(request)
+        if authorized:
+            return update_circuit(request, circuit)
+        else:
+            return HttpResponse(status=status.HTTP_401_UNAUTHORIZED)
     elif request.method == 'DELETE':
         authorized = check_request_token(request)
         if authorized:
@@ -335,6 +386,12 @@ def cup(request, pk):
         return HttpResponse(status=status.HTTP_404_NOT_FOUND)
     if request.method == 'GET':
         return cup_detail(request, cup)
+    elif request.method == 'PUT':
+        authorized = check_request_token(request)
+        if authorized:
+            return update_cup(request, cup)
+        else:
+            return HttpResponse(status=status.HTTP_401_UNAUTHORIZED)
     elif request.method == 'DELETE':
         authorized = check_request_token(request)
         if authorized:
